@@ -1,12 +1,14 @@
 #!/bin/bash
 
 echo "Defining variables..."
-export RESOURCE_GROUP_NAME=mslearn-gh-pipelines-$RANDOM
+export RESOURCE_SUFFIX="glm"
+export RESOURCE_GROUP_NAME=mslearn-gh-pipelines-$RESOURCE_SUFFIX
 export AKS_NAME=contoso-video
-export ACR_NAME=ContosoContainerRegistry$RANDOM
+export ACR_NAME=ContosoContainerRegistry$RESOURCE_SUFFIX
+export LOCATION=eastus
 
 echo "Searching for resource group..."
-az group create -n $RESOURCE_GROUP_NAME -l eastus
+az group create -n $RESOURCE_GROUP_NAME -l $LOCATION
 
 echo "Creating cluster..."
 az aks create \
@@ -40,9 +42,16 @@ sed -i '' 's+!IMAGE!+'"$ACR_NAME"'/contoso-website+g' kubernetes/deployment.yaml
 sed -i '' 's+!DNS!+'"$DNS_NAME"'+g' kubernetes/ingress.yaml
 
 echo "Installation concluded, copy these values and store them, you'll use them later in this exercise:"
-echo "-> Resource Group Name: $RESOURCE_GROUP_NAME"
+
+echo "-> Resource Group Name: $RESOURCE_GROUP_NAME" 
+#mslearn-gh-pipelines-glm
 echo "-> ACR Name: $ACR_NAME"
+#contosocontainerregistryglm.azurecr.io
 echo "-> ACR Login Username: $ACR_USERNAME"
+#ContosoContainerRegistryglm
 echo "-> ACR Password: $ACR_PASSWORD"
-echo "-> AKS Cluster Name: $ACR_NAME"
+#gzkrC=kxGWgMw8+n1ph8X3o0175SX7/5
+echo "-> AKS Cluster Name: $AKS_NAME"
+#contoso-video
 echo "-> AKS DNS Zone Name: $DNS_NAME"
+#contoso.320e7a3489b04980aa9f.eastus.aksapp.io
