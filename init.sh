@@ -54,6 +54,6 @@ echo "-> ACR Password: $ACR_PASSWORD"
 echo "-> AKS Cluster Name: $AKS_NAME"
 #contoso-video
 echo "-> AKS DNS Zone Name: $DNS_NAME"
-#contoso.320e7a3489b04980aa9f.eastus.aksapp.io
+#320e7a3489b04980aa9f.eastus.aksapp.io
 
 
