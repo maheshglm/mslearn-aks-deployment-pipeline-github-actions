@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Build and push the latest build to staging
 
 # Controls when the workflow will run
@@ -12,10 +10,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build_push_image:
-    # The type of runner that the job will run on
     runs-on: ubuntu-20.04
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
@@ -47,3 +42,41 @@ jobs:
           tags: ${{ secrets.ACR_REGISTRY }}/contoso-website:latest
           context: .
           push: true
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_push_image # Will wait for the execution of the previous job
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Helm tool
+        uses: Azure/setup-helm@v1
+        with:
+          version: v3.3.1 # default is latest
+      
+      - name: Azure k8s set context
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          resource-group: mslearn-gh-pipelines-glm
+          cluster-name: contoso-video
+
+      - name: Run Helm Deploy
+        run: |
+          helm upgrade \
+            --install \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace staging \
+            contoso-website \
+            ./kubernetes/contoso-website \
+            --set image.registry=${{ secrets.ACR_REGISTRY }} \
+            --set dns.name=${{ secrets.DNS_NAME }}
+
+
+
+
+
